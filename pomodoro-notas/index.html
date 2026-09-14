@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pomodoro + Notas</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>🍅 Pomodoro + Notas</h1>
+      <p class="subtitle">Enfócate en una tarea a la vez</p>
+    </header>
+
+    <section class="timer-card">
+      <div class="mode-tabs">
+        <button class="mode-btn active" data-mode="work">Trabajo</button>
+        <button class="mode-btn" data-mode="short">Descanso corto</button>
+        <button class="mode-btn" data-mode="long">Descanso largo</button>
+      </div>
+
+      <div class="timer-ring">
+        <svg viewBox="0 0 200 200" class="ring-svg">
+          <circle cx="100" cy="100" r="90" class="ring-bg"></circle>
+          <circle cx="100" cy="100" r="90" class="ring-progress" id="ringProgress"></circle>
+        </svg>
+        <div class="timer-display">
+          <span id="timeLabel">25:00</span>
+          <span id="activeTaskLabel" class="active-task">Sin tarea activa</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="startBtn" class="btn primary">Iniciar</button>
+        <button id="pauseBtn" class="btn" disabled>Pausar</button>
+        <button id="resetBtn" class="btn">Reiniciar</button>
+      </div>
+
+      <div class="session-count">
+        Pomodoros completados hoy: <strong id="sessionCount">0</strong>
+      </div>
+    </section>
+
+    <section class="tasks-card">
+      <h2>Tareas</h2>
+      <form id="taskForm" class="task-form">
+        <input type="text" id="taskInput" placeholder="Añadir una tarea..." autocomplete="off" required>
+        <button type="submit" class="btn primary">Añadir</button>
+      </form>
+      <ul id="taskList" class="task-list"></ul>
+    </section>
+
+    <section class="settings-card">
+      <details>
+        <summary>⚙️ Ajustes de duración</summary>
+        <div class="settings-grid">
+          <label>Trabajo (min) <input type="number" id="workMin" min="1" max="90" value="25"></label>
+          <label>Descanso corto (min) <input type="number" id="shortMin" min="1" max="30" value="5"></label>
+          <label>Descanso largo (min) <input type="number" id="longMin" min="1" max="60" value="15"></label>
+        </div>
+      </details>
+    </section>
+  </div>
+
+  <audio id="dingSound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRl9vAABXQVZFZm10IBAAAAABAAEAgD4AAAB9AAACABAAZGF0YTtvAAA=" type="audio/wav">
+  </audio>
+
+  <script src="app.js"></script>
+</body>
+</html>
