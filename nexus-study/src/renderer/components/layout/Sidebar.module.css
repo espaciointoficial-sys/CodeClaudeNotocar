@@ -2,12 +2,18 @@
   width: var(--sidebar-width);
   flex-shrink: 0;
   background: var(--bg-surface);
-  border-right: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   padding: var(--space-4) var(--space-3);
   height: 100%;
-  overflow-y: auto;
+  transition: width var(--ease-base);
+}
+
+.sidebar[data-collapsed='true'] {
+  width: var(--sidebar-width-collapsed);
+  align-items: center;
 }
 
 .brand {
@@ -15,17 +21,79 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-2) var(--space-5);
+  width: 100%;
+}
+
+.sidebar[data-collapsed='true'] .brand {
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2) 0 var(--space-5);
 }
 
 .brandMark {
   display: flex;
   color: var(--accent);
+  flex-shrink: 0;
 }
 
 .brandName {
   font-weight: 700;
   font-size: 15px;
   letter-spacing: -0.01em;
+  flex: 1;
+  white-space: nowrap;
+}
+
+.collapseToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--bg-subtle);
+  border: none;
+  color: var(--text-muted);
+}
+
+.collapseToggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.navScroll {
+  flex: 1;
+  overflow-y: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.navGroup {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--space-4);
+  width: 100%;
+  align-items: center;
+}
+
+.groupLabel {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0 var(--space-3) var(--space-2);
+  width: 100%;
+}
+
+.divider {
+  height: 1px;
+  width: 28px;
+  background: var(--border);
+  margin: var(--space-1) 0 var(--space-3);
 }
 
 .navList {
@@ -35,12 +103,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-}
-
-.divider {
-  height: 1px;
-  background: var(--border);
-  margin: var(--space-3) var(--space-2);
+  width: 100%;
 }
 
 .navItem {
@@ -56,6 +119,12 @@
   font-size: 13.5px;
   font-weight: 500;
   text-align: left;
+  transition: background-color var(--ease-fast), color var(--ease-fast);
+}
+
+.sidebar[data-collapsed='true'] .navItem {
+  justify-content: center;
+  padding: 9px;
 }
 
 .navItem:hover {
@@ -81,18 +150,10 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-top: var(--space-4);
   padding-top: var(--space-3);
   border-top: 1px solid var(--border);
-}
-
-.quickActionsLabel {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 0 var(--space-3) 2px;
+  width: 100%;
+  align-items: center;
 }
 
 .quickAction {
@@ -108,6 +169,11 @@
   font-weight: 500;
   color: var(--text-secondary);
   text-align: left;
+}
+
+.sidebar[data-collapsed='true'] .quickAction {
+  justify-content: center;
+  padding: 8px;
 }
 
 .quickAction svg {
@@ -128,4 +194,5 @@
   border-top: 1px solid var(--border);
   padding-top: var(--space-3);
   margin-top: var(--space-3);
+  width: 100%;
 }

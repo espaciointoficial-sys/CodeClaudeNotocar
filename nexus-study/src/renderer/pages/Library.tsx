@@ -64,6 +64,7 @@ export function Library({ focusSearch }: { focusSearch?: boolean }) {
   }, [search, subjectId, fileType, favoritesOnly, sortBy]);
 
   const subjectNameById = useMemo(() => new Map(subjects.map((s) => [s.id, s.name])), [subjects]);
+  const hasActiveFilters = Boolean(search || subjectId || fileType || favoritesOnly || dateFilter !== 'any');
 
   const visibleDocuments = useMemo(() => {
     if (!documents) return null;
@@ -147,11 +148,19 @@ export function Library({ focusSearch }: { focusSearch?: boolean }) {
         {!visibleDocuments ? (
           <Spinner />
         ) : visibleDocuments.length === 0 ? (
-          <EmptyState
-            icon="search"
-            title="Sin resultados"
-            description="Prueba con otros términos de búsqueda o cambia los filtros. La búsqueda incluye el texto dentro de los PDF, no solo el título."
-          />
+          hasActiveFilters ? (
+            <EmptyState
+              icon="search"
+              title="Sin resultados"
+              description="Prueba con otros términos de búsqueda o cambia los filtros. La búsqueda incluye el texto dentro de los PDF, no solo el título."
+            />
+          ) : (
+            <EmptyState
+              icon="paperclip"
+              title="Todavía no has importado ningún apunte"
+              description="Entra en una asignatura para importar tus primeros documentos."
+            />
+          )
         ) : (
           <div className={styles.list}>
             {visibleDocuments.map((doc) => (

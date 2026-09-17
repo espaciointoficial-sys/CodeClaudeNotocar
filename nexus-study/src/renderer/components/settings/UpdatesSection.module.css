@@ -1,7 +1,7 @@
 .section {
   background: var(--bg-surface);
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   padding: var(--space-5);
   margin-bottom: var(--space-4);
   max-width: 640px;

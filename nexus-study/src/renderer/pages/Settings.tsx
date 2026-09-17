@@ -10,7 +10,6 @@ import styles from './Settings.module.css';
 
 const WIDGET_LABELS: { key: keyof WidgetPreferences; label: string }[] = [
   { key: 'summary', label: 'Resumen académico' },
-  { key: 'weather', label: 'Tiempo meteorológico' },
   { key: 'gmail', label: 'Gmail' },
   { key: 'discord', label: 'Discord' },
   { key: 'pinterest', label: 'Pinterest' },
@@ -18,16 +17,12 @@ const WIDGET_LABELS: { key: keyof WidgetPreferences; label: string }[] = [
 
 export function Settings() {
   const [settings, setSettings] = useState<AppSettings | null>(null);
-  const [cityDraft, setCityDraft] = useState('');
   const { theme, setTheme } = useTheme();
   const pomodoro = usePomodoro();
   const { showToast } = useToast();
 
   useEffect(() => {
-    window.api.settings.get().then((s) => {
-      setSettings(s);
-      setCityDraft(s.weatherCity ?? '');
-    });
+    window.api.settings.get().then(setSettings);
   }, []);
 
   const persist = async (patch: Partial<AppSettings>) => {
@@ -128,30 +123,6 @@ export function Settings() {
               {label}
             </label>
           ))}
-          {settings.widgets.weather && (
-            <div className={styles.subField}>
-              <FormField
-                label="Ciudad para el tiempo"
-                htmlFor="weather-city"
-                hint="Usa el servicio gratuito Open-Meteo; no requiere cuenta ni conexión permanente."
-              >
-                <input
-                  id="weather-city"
-                  className="input"
-                  style={{ maxWidth: 280 }}
-                  placeholder="Ej. Madrid"
-                  value={cityDraft}
-                  onChange={(e) => setCityDraft(e.target.value)}
-                  onBlur={() => {
-                    if (cityDraft.trim() !== (settings.weatherCity ?? '')) {
-                      persist({ weatherCity: cityDraft.trim() || null });
-                    }
-                  }}
-                  onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-                />
-              </FormField>
-            </div>
-          )}
         </section>
 
         <section className={styles.section}>

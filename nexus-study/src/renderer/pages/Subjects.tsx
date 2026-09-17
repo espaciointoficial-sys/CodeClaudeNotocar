@@ -132,10 +132,10 @@ export function Subjects({
             <option value="createdAt">Creación</option>
           </select>
           <div className={styles.layoutToggle}>
-            <button data-active={layout === 'grid'} onClick={() => setLayout('grid')} aria-label="Vista de tarjetas" title="Vista de tarjetas">
+            <button data-active={layout === 'grid'} onClick={() => setLayout('grid')} aria-label="Vista de tarjetas" data-tooltip="Vista de tarjetas">
               <Icon name="grid" size={16} />
             </button>
-            <button data-active={layout === 'list'} onClick={() => setLayout('list')} aria-label="Vista de lista" title="Vista de lista">
+            <button data-active={layout === 'list'} onClick={() => setLayout('list')} aria-label="Vista de lista" data-tooltip="Vista de lista">
               <Icon name="list" size={16} />
             </button>
           </div>

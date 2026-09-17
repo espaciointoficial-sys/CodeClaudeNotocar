@@ -120,7 +120,7 @@ export const PdfViewer = forwardRef<PdfViewerHandle, PdfViewerProps>(function Pd
   return (
     <div className={styles.wrap}>
       <div className={styles.toolbar}>
-        <button onClick={() => goToPage(page - 1)} disabled={page <= 1} aria-label="Página anterior" title="Página anterior">
+        <button onClick={() => goToPage(page - 1)} disabled={page <= 1} aria-label="Página anterior" data-tooltip="Página anterior">
           <Icon name="chevron-left" size={16} />
         </button>
         <form
@@ -138,7 +138,7 @@ export const PdfViewer = forwardRef<PdfViewerHandle, PdfViewerProps>(function Pd
           />
           <span>/ {numPages || '…'}</span>
         </form>
-        <button onClick={() => goToPage(page + 1)} disabled={page >= numPages} aria-label="Página siguiente" title="Página siguiente">
+        <button onClick={() => goToPage(page + 1)} disabled={page >= numPages} aria-label="Página siguiente" data-tooltip="Página siguiente">
           <Icon name="chevron-right" size={16} />
         </button>
         <div className={styles.zoomGroup}>
@@ -148,7 +148,7 @@ export const PdfViewer = forwardRef<PdfViewerHandle, PdfViewerProps>(function Pd
               setCustomScale((s) => Math.max(0.4, s - 0.15));
             }}
             aria-label="Reducir zoom"
-            title="Reducir zoom"
+            data-tooltip="Reducir zoom"
           >
             <Icon name="zoom-out" size={16} />
           </button>
@@ -158,7 +158,7 @@ export const PdfViewer = forwardRef<PdfViewerHandle, PdfViewerProps>(function Pd
               setCustomScale((s) => Math.min(3, s + 0.15));
             }}
             aria-label="Aumentar zoom"
-            title="Aumentar zoom"
+            data-tooltip="Aumentar zoom"
           >
             <Icon name="zoom-in" size={16} />
           </button>

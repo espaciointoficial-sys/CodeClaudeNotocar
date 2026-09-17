@@ -1,28 +1,33 @@
 .card {
   background: var(--bg-surface);
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
   display: flex;
   align-items: flex-start;
   gap: var(--space-2);
   border-top: 3px solid var(--subject-color);
-  transition: box-shadow 120ms ease;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--ease-fast), transform var(--ease-fast);
 }
 
 .card:hover {
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .row {
   background: var(--bg-surface);
-  border: 1px solid var(--border);
   border-left: 3px solid var(--subject-color);
   border-radius: var(--radius-md);
   padding: var(--space-3) var(--space-4);
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  box-shadow: var(--shadow-sm);
+}
+
+.row:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .mainArea {

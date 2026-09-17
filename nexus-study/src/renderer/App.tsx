@@ -12,6 +12,7 @@ import { SubjectDetail } from './pages/SubjectDetail';
 import { Library } from './pages/Library';
 import { Agenda } from './pages/Agenda';
 import { Statistics } from './pages/Statistics';
+import { Weather } from './pages/Weather';
 import { Dashboard } from './pages/Dashboard';
 import { Settings } from './pages/Settings';
 import styles from './App.module.css';
@@ -25,6 +26,7 @@ export type View =
   | { name: 'library'; searchFocus?: boolean }
   | { name: 'agenda' }
   | { name: 'stats' }
+  | { name: 'weather' }
   | { name: 'dashboard' }
   | { name: 'settings' };
 
@@ -77,6 +79,7 @@ function AppShell() {
         {view.name === 'library' && <Library focusSearch={view.searchFocus} />}
         {view.name === 'agenda' && <Agenda />}
         {view.name === 'stats' && <Statistics />}
+        {view.name === 'weather' && <Weather />}
         {view.name === 'dashboard' && <Dashboard />}
         {view.name === 'settings' && <Settings />}
       </main>

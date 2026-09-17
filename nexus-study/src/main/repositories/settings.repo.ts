@@ -14,7 +14,6 @@ interface SettingsRow {
 
 const DEFAULT_WIDGETS: WidgetPreferences = {
   summary: true,
-  weather: true,
   gmail: true,
   discord: true,
   pinterest: true,

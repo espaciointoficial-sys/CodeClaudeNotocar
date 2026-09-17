@@ -41,11 +41,11 @@ export function ImageViewer({ url }: { url: string }) {
   return (
     <div className={styles.wrap}>
       <div className={styles.toolbar}>
-        <button onClick={() => setScale((s) => Math.max(0.3, s - 0.2))} aria-label="Reducir zoom" title="Reducir zoom">
+        <button onClick={() => setScale((s) => Math.max(0.3, s - 0.2))} aria-label="Reducir zoom" data-tooltip="Reducir zoom">
           <Icon name="zoom-out" size={16} />
         </button>
         <span>{Math.round(scale * 100)}%</span>
-        <button onClick={() => setScale((s) => Math.min(4, s + 0.2))} aria-label="Aumentar zoom" title="Aumentar zoom">
+        <button onClick={() => setScale((s) => Math.min(4, s + 0.2))} aria-label="Aumentar zoom" data-tooltip="Aumentar zoom">
           <Icon name="zoom-in" size={16} />
         </button>
         <button onClick={resetView}>Ajustar a pantalla</button>

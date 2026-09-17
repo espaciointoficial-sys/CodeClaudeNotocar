@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { Spinner } from '../../components/ui/Spinner';
 import { Icon } from '../../components/ui/Icon';
+import { DropdownMenu } from '../../components/ui/DropdownMenu';
 import { SubjectForm } from '../../components/subjects/SubjectForm';
 import { useToast } from '../../contexts/ToastContext';
 import { usePomodoro } from '../../contexts/PomodoroContext';
@@ -97,11 +98,13 @@ export function SubjectDetail({ subjectId, initialTab, onNavigate }: SubjectDeta
               <p>{[subject.professor, subject.term].filter(Boolean).join(' · ') || 'Sin detalles adicionales'}</p>
             </div>
             <div className={styles.headActions}>
-              <Button onClick={() => setEditing(true)}>Editar</Button>
-              <Button onClick={handleArchive}>{subject.status === 'active' ? 'Archivar' : 'Reactivar'}</Button>
-              <Button variant="danger" onClick={() => setDeleting(true)}>
-                Eliminar
-              </Button>
+              <DropdownMenu
+                actions={[
+                  { label: 'Editar', onSelect: () => setEditing(true) },
+                  { label: subject.status === 'active' ? 'Archivar' : 'Reactivar', onSelect: handleArchive },
+                  { label: 'Eliminar', danger: true, onSelect: () => setDeleting(true) },
+                ]}
+              />
             </div>
           </div>
 
@@ -116,6 +119,10 @@ export function SubjectDetail({ subjectId, initialTab, onNavigate }: SubjectDeta
           </div>
 
           <div className={styles.quickActions}>
+            <Button size="sm" variant="primary" onClick={startStudySession}>
+              <Icon name="play" size={13} filled />
+              Iniciar sesión de estudio
+            </Button>
             <Button size="sm" onClick={() => setTab('documents')}>
               Subir apunte
             </Button>
@@ -124,9 +131,6 @@ export function SubjectDetail({ subjectId, initialTab, onNavigate }: SubjectDeta
             </Button>
             <Button size="sm" onClick={() => setTab('tasks')}>
               Nueva tarea
-            </Button>
-            <Button size="sm" onClick={startStudySession}>
-              Iniciar sesión de estudio
             </Button>
           </div>
 

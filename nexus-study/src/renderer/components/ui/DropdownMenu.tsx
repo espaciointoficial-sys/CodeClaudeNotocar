@@ -39,6 +39,7 @@ export function DropdownMenu({ trigger, actions }: { trigger?: ReactNode; action
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Más opciones"
+        data-tooltip={open ? undefined : 'Más opciones'}
       >
         {trigger ?? <Icon name="more-vertical" size={16} />}
       </button>

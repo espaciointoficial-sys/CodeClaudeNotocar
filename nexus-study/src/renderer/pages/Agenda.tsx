@@ -39,6 +39,7 @@ export function Agenda() {
   }, [subjectFilter, typeFilter]);
 
   const subjectNameById = useMemo(() => new Map(subjects.map((s) => [s.id, s.name])), [subjects]);
+  const subjectColorById = useMemo(() => new Map(subjects.map((s) => [s.id, s.color])), [subjects]);
 
   const eventsByBucket = useMemo(() => {
     const map = new Map<AgendaBucket, AcademicEvent[]>();
@@ -136,6 +137,7 @@ export function Agenda() {
                         key={`event-${event.id}`}
                         event={event}
                         subjectLabel={event.subjectId ? subjectNameById.get(event.subjectId) : undefined}
+                        subjectColor={event.subjectId ? subjectColorById.get(event.subjectId) : undefined}
                         onEdit={() => setEditingEvent(event)}
                         onDelete={() => setDeletingEventId(event.id)}
                       />
@@ -145,6 +147,7 @@ export function Agenda() {
                         key={`task-${task.id}`}
                         task={task}
                         subjectLabel={subjectNameById.get(task.subjectId)}
+                        subjectColor={subjectColorById.get(task.subjectId)}
                         onToggleComplete={() => handleCompleteTask(task)}
                       />
                     ))}
@@ -162,6 +165,7 @@ export function Agenda() {
                       key={task.id}
                       task={task}
                       subjectLabel={subjectNameById.get(task.subjectId)}
+                      subjectColor={subjectColorById.get(task.subjectId)}
                       onToggleComplete={() => handleCompleteTask(task)}
                     />
                   ))}

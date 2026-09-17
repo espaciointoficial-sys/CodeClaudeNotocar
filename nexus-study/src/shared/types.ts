@@ -197,7 +197,6 @@ export type ThemePreference = 'light' | 'dark' | 'system';
 
 export interface WidgetPreferences {
   summary: boolean;
-  weather: boolean;
   gmail: boolean;
   discord: boolean;
   pinterest: boolean;

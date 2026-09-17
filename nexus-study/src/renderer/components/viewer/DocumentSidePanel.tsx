@@ -113,7 +113,7 @@ export function DocumentSidePanel({ document, currentPage, isPdf, onJumpToPage }
                   <button onClick={() => onJumpToPage(b.page)}>
                     Pág. {b.page} {b.label ? `· ${b.label}` : ''}
                   </button>
-                  <button className={styles.removeBookmark} onClick={() => removeBookmark(b.id)} aria-label="Eliminar marcador" title="Eliminar marcador">
+                  <button className={styles.removeBookmark} onClick={() => removeBookmark(b.id)} aria-label="Eliminar marcador" data-tooltip="Eliminar marcador">
                     <Icon name="x" size={14} />
                   </button>
                 </li>

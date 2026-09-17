@@ -34,6 +34,9 @@ const PATHS: Record<string, string> = {
   pin: 'M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z M12 10.5a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6z',
   'external-link': 'M14 5h5v5 M19 5 10 14 M7 5H5v14h14v-2',
   download: 'M12 3v12M7 10l5 5 5-5M4 21h16',
+  sun: 'M12 17.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11z M12 2.5v2.3M12 19.2v2.3M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.3M19.2 12h2.3M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6',
+  'chevron-down': 'M5 9l7 7 7-7',
+  refresh: 'M3.5 9.5A8.5 8.5 0 0 1 19 6.5M20.5 14.5A8.5 8.5 0 0 1 5 17.5 M19 3v5h-5 M5 21v-5h5',
 };
 
 export type IconName = keyof typeof PATHS;

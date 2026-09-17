@@ -3,9 +3,17 @@
   align-items: flex-start;
   gap: var(--space-2);
   background: var(--bg-surface);
-  border: 1px solid var(--border);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   padding: var(--space-3);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
 }
 
 .body {
@@ -21,6 +29,8 @@
 }
 
 .subject {
+  display: inline-flex;
+  align-items: center;
   font-size: 12px;
   color: var(--text-muted);
 }

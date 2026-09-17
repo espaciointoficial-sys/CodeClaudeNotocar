@@ -3,9 +3,14 @@
   align-items: center;
   gap: var(--space-2);
   background: var(--bg-surface);
-  border: 1px solid var(--border);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   padding: var(--space-3);
+  transition: box-shadow var(--ease-fast);
+}
+
+.item:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .main {

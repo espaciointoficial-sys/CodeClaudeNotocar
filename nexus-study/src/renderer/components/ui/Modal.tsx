@@ -32,7 +32,7 @@ export function Modal({ title, onClose, children, footer, width = 480 }: ModalPr
       >
         <header className={styles.header}>
           <h2>{title}</h2>
-          <button className={styles.close} onClick={onClose} aria-label="Cerrar">
+          <button className={styles.close} onClick={onClose} aria-label="Cerrar" data-tooltip="Cerrar">
             <Icon name="x" size={16} />
           </button>
         </header>

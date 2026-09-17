@@ -44,7 +44,9 @@ export function DocumentListItem({
           <Icon name={FILE_ICON[document.fileType] ?? 'file'} size={20} />
         </span>
         <div className={styles.info}>
-          <p className={styles.title}>{document.title}</p>
+          <p className={styles.title} title={document.title}>
+            {document.title}
+          </p>
           <p className={styles.meta}>
             {[subjectLabel, folderLabel, formatDate(document.importedAt), formatFileSize(document.sizeBytes)]
               .filter(Boolean)
@@ -68,7 +70,7 @@ export function DocumentListItem({
         data-active={document.isFavorite}
         onClick={onToggleFavorite}
         aria-label={document.isFavorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
-        title={document.isFavorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
+        data-tooltip={document.isFavorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
       >
         <Icon name="star" size={16} filled={document.isFavorite} />
       </button>

@@ -1,55 +1,10 @@
 import { useEffect, useState } from 'react';
-import type { AppSettings, HomeSummary, WeatherResult } from '@shared/types';
+import type { AppSettings, HomeSummary } from '@shared/types';
 import { PageHeader } from '../components/layout/PageHeader';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Icon, type IconName } from '../components/ui/Icon';
 import { formatRelativeDay } from '../lib/format';
-import { describeWeatherCode } from '../lib/weatherCodes';
 import styles from './Dashboard.module.css';
-
-// Se renderiza con key={city} desde Dashboard: un cambio de ciudad remonta el
-// componente en vez de mutar el estado, así "loading" arranca en true de forma natural.
-function WeatherCard({ city }: { city: string | null }) {
-  const [result, setResult] = useState<WeatherResult | null>(null);
-  const [loading, setLoading] = useState(Boolean(city));
-
-  useEffect(() => {
-    if (!city) return;
-    window.api.weather.current(city).then((r) => {
-      setResult(r);
-      setLoading(false);
-    });
-  }, [city]);
-
-  return (
-    <section className={styles.card}>
-      <h2>Tiempo</h2>
-      {!city ? (
-        <EmptyState
-          icon="sliders"
-          compact
-          title="Sin ciudad configurada"
-          description="Añade tu ciudad en Ajustes para ver el tiempo actual."
-        />
-      ) : loading ? (
-        <p className={styles.muted}>Consultando el tiempo en {city}…</p>
-      ) : result?.ok ? (
-        <>
-          <div className={styles.weather}>
-            <span className={styles.weatherIcon}>{describeWeatherCode(result.weatherCode!).icon}</span>
-            <div>
-              <p className={styles.weatherTemp}>{result.temperature}°C</p>
-              <p className={styles.muted}>{describeWeatherCode(result.weatherCode!).label}</p>
-            </div>
-          </div>
-          <p className={styles.comingSoonText}>{result.cityLabel}</p>
-        </>
-      ) : (
-        <p className={styles.muted}>{result?.error ?? 'No se pudo obtener el tiempo.'}</p>
-      )}
-    </section>
-  );
-}
 
 function ComingSoonCard({ icon, name, url }: { icon: IconName; name: string; url: string }) {
   return (
@@ -89,7 +44,7 @@ export function Dashboard() {
     <div>
       <PageHeader
         title="Dashboard"
-        description="Widgets complementarios. Actívalos o desactívalos desde Ajustes."
+        description="Accesos complementarios. Actívalos o desactívalos desde Ajustes."
       />
       <div className="page-body">
         <div className={styles.grid}>
@@ -116,8 +71,6 @@ export function Dashboard() {
               )}
             </section>
           )}
-
-          {settings.widgets.weather && <WeatherCard key={settings.weatherCity ?? 'none'} city={settings.weatherCity} />}
 
           {settings.widgets.gmail && <ComingSoonCard icon="mail" name="Gmail" url="https://mail.google.com" />}
           {settings.widgets.discord && <ComingSoonCard icon="message-circle" name="Discord" url="https://discord.com/app" />}

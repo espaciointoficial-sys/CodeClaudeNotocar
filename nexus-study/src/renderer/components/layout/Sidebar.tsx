@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import type { View } from '../../App';
 import { PomodoroMiniWidget } from '../pomodoro/PomodoroMiniWidget';
 import { usePomodoro } from '../../contexts/PomodoroContext';
@@ -11,25 +12,51 @@ interface NavItem {
   icon: IconName;
 }
 
-const PRIMARY_NAV: NavItem[] = [
-  { key: 'home', label: 'Inicio', icon: 'home' },
-  { key: 'subjects', label: 'Asignaturas', icon: 'book' },
-  { key: 'agenda', label: 'Agenda', icon: 'calendar' },
-  { key: 'library', label: 'Biblioteca', icon: 'search' },
+interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: 'Estudio',
+    items: [
+      { key: 'home', label: 'Inicio', icon: 'home' },
+      { key: 'subjects', label: 'Asignaturas', icon: 'book' },
+      { key: 'library', label: 'Biblioteca', icon: 'search' },
+      { key: 'agenda', label: 'Agenda', icon: 'calendar' },
+    ],
+  },
+  {
+    label: 'Progreso',
+    items: [{ key: 'stats', label: 'Estadísticas', icon: 'bar-chart' }],
+  },
+  {
+    label: 'Complementos',
+    items: [
+      { key: 'weather', label: 'Tiempo', icon: 'sun' },
+      { key: 'dashboard', label: 'Dashboard', icon: 'layout' },
+    ],
+  },
+  {
+    label: 'Sistema',
+    items: [{ key: 'settings', label: 'Ajustes', icon: 'sliders' }],
+  },
 ];
 
-const SECONDARY_NAV: NavItem[] = [
-  { key: 'stats', label: 'Estadísticas', icon: 'bar-chart' },
-  { key: 'dashboard', label: 'Dashboard', icon: 'layout' },
-  { key: 'settings', label: 'Ajustes', icon: 'sliders' },
-];
+const COLLAPSE_STORAGE_KEY = 'nexus.sidebarCollapsed';
 
 interface SidebarProps {
   activeView: View['name'];
   onNavigate: (view: View) => void;
 }
 
-function NavList({ items, activeView, onNavigate }: SidebarProps & { items: NavItem[] }) {
+function NavList({
+  items,
+  activeView,
+  onNavigate,
+  collapsed,
+}: SidebarProps & { items: NavItem[]; collapsed: boolean }) {
   return (
     <ul className={styles.navList}>
       {items.map((item) => (
@@ -37,12 +64,14 @@ function NavList({ items, activeView, onNavigate }: SidebarProps & { items: NavI
           <button
             className={styles.navItem}
             data-active={activeView === item.key}
+            aria-label={item.label}
+            data-tooltip={collapsed ? item.label : undefined}
             onClick={() => onNavigate({ name: item.key } as View)}
           >
             <span className={styles.navIcon}>
               <Icon name={item.icon} size={17} />
             </span>
-            {item.label}
+            {!collapsed && item.label}
           </button>
         </li>
       ))}
@@ -53,6 +82,21 @@ function NavList({ items, activeView, onNavigate }: SidebarProps & { items: NavI
 export function Sidebar({ activeView, onNavigate }: SidebarProps) {
   const pomodoro = usePomodoro();
   const { showToast } = useToast();
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem(COLLAPSE_STORAGE_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(COLLAPSE_STORAGE_KEY, collapsed ? '1' : '0');
+    } catch {
+      /* almacenamiento no disponible: la preferencia simplemente no persiste */
+    }
+  }, [collapsed]);
 
   const importNotes = () => {
     showToast('Elige una asignatura para importar un apunte.', 'info');
@@ -67,39 +111,66 @@ export function Sidebar({ activeView, onNavigate }: SidebarProps) {
   };
 
   return (
-    <nav className={styles.sidebar} aria-label="Navegación principal">
+    <nav className={styles.sidebar} data-collapsed={collapsed} aria-label="Navegación principal">
       <div className={styles.brand}>
         <span className={styles.brandMark}>
           <Icon name="book" size={18} />
         </span>
-        <span className={styles.brandName}>Nexus Study</span>
+        {!collapsed && <span className={styles.brandName}>Nexus Study</span>}
+        <button
+          className={styles.collapseToggle}
+          onClick={() => setCollapsed((v) => !v)}
+          aria-label={collapsed ? 'Expandir barra lateral' : 'Contraer barra lateral'}
+          data-tooltip={collapsed ? 'Expandir' : undefined}
+        >
+          <Icon name={collapsed ? 'chevron-right' : 'chevron-left'} size={14} />
+        </button>
       </div>
 
-      <NavList items={PRIMARY_NAV} activeView={activeView} onNavigate={onNavigate} />
-      <div className={styles.divider} />
-      <NavList items={SECONDARY_NAV} activeView={activeView} onNavigate={onNavigate} />
+      <div className={styles.navScroll}>
+        {NAV_GROUPS.map((group, i) => (
+          <div className={styles.navGroup} key={group.label}>
+            {!collapsed && <span className={styles.groupLabel}>{group.label}</span>}
+            <NavList items={group.items} activeView={activeView} onNavigate={onNavigate} collapsed={collapsed} />
+            {collapsed && i < NAV_GROUPS.length - 1 && <div className={styles.divider} />}
+          </div>
+        ))}
 
-      <div className={styles.quickActions}>
-        <span className={styles.quickActionsLabel}>Acciones rápidas</span>
-        <button
-          className={styles.quickAction}
-          onClick={() => onNavigate({ name: 'subjects', openCreateToken: Date.now() })}
-        >
-          <Icon name="plus" size={15} />
-          Nueva asignatura
-        </button>
-        <button className={styles.quickAction} onClick={importNotes}>
-          <Icon name="paperclip" size={15} />
-          Importar apuntes
-        </button>
-        <button className={styles.quickAction} onClick={startStudySession} disabled={pomodoro.status === 'running'}>
-          <Icon name="play" size={15} />
-          {pomodoro.status === 'running' ? 'Sesión en curso' : 'Iniciar sesión de estudio'}
-        </button>
+        <div className={styles.quickActions}>
+          {!collapsed && <span className={styles.groupLabel}>Acciones rápidas</span>}
+          <button
+            className={styles.quickAction}
+            onClick={() => onNavigate({ name: 'subjects', openCreateToken: Date.now() })}
+            aria-label="Nueva asignatura"
+            data-tooltip={collapsed ? 'Nueva asignatura' : undefined}
+          >
+            <Icon name="plus" size={15} />
+            {!collapsed && 'Nueva asignatura'}
+          </button>
+          <button
+            className={styles.quickAction}
+            onClick={importNotes}
+            aria-label="Importar apuntes"
+            data-tooltip={collapsed ? 'Importar apuntes' : undefined}
+          >
+            <Icon name="paperclip" size={15} />
+            {!collapsed && 'Importar apuntes'}
+          </button>
+          <button
+            className={styles.quickAction}
+            onClick={startStudySession}
+            disabled={pomodoro.status === 'running'}
+            aria-label="Iniciar sesión de estudio"
+            data-tooltip={collapsed ? 'Iniciar sesión de estudio' : undefined}
+          >
+            <Icon name="play" size={15} />
+            {!collapsed && (pomodoro.status === 'running' ? 'Sesión en curso' : 'Iniciar sesión de estudio')}
+          </button>
+        </div>
       </div>
 
       <div className={styles.footer}>
-        <PomodoroMiniWidget />
+        <PomodoroMiniWidget compact={collapsed} />
       </div>
     </nav>
   );
