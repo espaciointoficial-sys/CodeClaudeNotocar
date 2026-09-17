@@ -36,6 +36,22 @@ jobs:
           npm run lint
           npm test
 
+      - name: Crear la Release en GitHub si no existe todavía
+        # electron-builder sube el instalador y su .blockmap en paralelo; si la Release
+        # de esta etiqueta no existe aún, cada subida intenta crearla por su cuenta y
+        # aparecen dos Releases duplicadas. Creándola aquí primero (vacía, en borrador),
+        # electron-builder la encuentra ya existente y solo le añade los archivos.
+        shell: bash
+        run: |
+          if ! gh release view "${{ github.ref_name }}" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "${{ github.ref_name }}" --repo "$GITHUB_REPOSITORY" \
+              --title "Nexus Study ${{ github.ref_name }}" \
+              --notes "Publicado automáticamente por GitHub Actions." \
+              --draft
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Compilar y publicar en GitHub Releases
         run: npm run release
         env:
