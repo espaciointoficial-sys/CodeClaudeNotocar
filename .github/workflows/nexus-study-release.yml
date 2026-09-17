@@ -1,0 +1,44 @@
+name: Nexus Study - Release
+
+# Se dispara al subir una etiqueta de versión (por ejemplo v0.2.0).
+# Compila Nexus Study para Windows y publica el instalador + los metadatos
+# de actualización (latest.yml) como assets de una GitHub Release, para que
+# electron-updater pueda detectarlos desde las instalaciones existentes.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write # necesario para que electron-builder pueda crear la Release y subir assets
+
+jobs:
+  release:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: nexus-study
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: nexus-study/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Comprobaciones (typecheck, lint, tests)
+        run: |
+          npm run typecheck
+          npm run lint
+          npm test
+
+      - name: Compilar y publicar en GitHub Releases
+        run: npm run release
+        env:
+          # Token automático de Actions: como la release se publica en este mismo
+          # repositorio, no hace falta crear ningún secreto adicional.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

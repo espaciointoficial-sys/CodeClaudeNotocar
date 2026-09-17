@@ -1,0 +1,50 @@
+.swatchRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+}
+
+.swatch[data-selected='true'] {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-color: var(--bg-surface);
+}
+
+.iconRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.iconOption {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  font-size: 14px;
+  filter: saturate(0.45) opacity(0.75);
+  transition: filter 100ms ease, border-color 100ms ease;
+}
+
+.iconOption[data-selected='true'] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  filter: none;
+}
+
+.iconOption:hover {
+  background: var(--bg-hover);
+  filter: none;
+}

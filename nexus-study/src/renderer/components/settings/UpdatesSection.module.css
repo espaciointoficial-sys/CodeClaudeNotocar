@@ -1,0 +1,118 @@
+.section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+  max-width: 640px;
+}
+
+.section h2 {
+  font-size: 14px;
+  margin-bottom: var(--space-4);
+}
+
+.versionRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.versionRow strong {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.statusRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.statusIcon {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+}
+
+.statusIcon[data-tone='downloaded'],
+.statusIcon[data-tone='up-to-date'] {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.statusIcon[data-tone='error'] {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.statusIcon[data-tone='available'],
+.statusIcon[data-tone='downloading'],
+.statusIcon[data-tone='checking'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.statusText p {
+  font-size: 13.5px;
+  color: var(--text-primary);
+}
+
+.checkedAt {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.progressTrack {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  overflow: hidden;
+  margin: var(--space-3) 0 0 42px;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 300ms ease;
+}
+
+.error {
+  margin: var(--space-2) 0 0 42px;
+  font-size: 12.5px;
+  color: var(--danger);
+}
+
+.notesLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: var(--space-2) 0 0 42px;
+  font-size: 12.5px;
+  color: var(--accent);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.hint {
+  margin-top: var(--space-3);
+  font-size: 12px;
+  color: var(--text-muted);
+}
