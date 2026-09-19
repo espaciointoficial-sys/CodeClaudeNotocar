@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import type { View } from '../../App';
 import { PomodoroMiniWidget } from '../pomodoro/PomodoroMiniWidget';
 import { usePomodoro } from '../../contexts/PomodoroContext';
@@ -39,7 +39,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: 'Sistema',
+    label: 'Aplicación',
     items: [{ key: 'settings', label: 'Ajustes', icon: 'sliders' }],
   },
 ];
@@ -49,14 +49,18 @@ const COLLAPSE_STORAGE_KEY = 'nexus.sidebarCollapsed';
 interface SidebarProps {
   activeView: View['name'];
   onNavigate: (view: View) => void;
+  /** Vuelve al selector inicial. El espacio no se cierra: sigue montado con todo su estado. */
+  onExitSpace: () => void;
 }
 
-function NavList({
+// memo: mientras el Pomodoro corre, la barra lateral se repinta cada segundo por el temporizador.
+// La lista de navegación no cambia en ese tic, así que se evita rehacerla 60 veces por minuto.
+const NavList = memo(function NavList({
   items,
   activeView,
   onNavigate,
   collapsed,
-}: SidebarProps & { items: NavItem[]; collapsed: boolean }) {
+}: Pick<SidebarProps, 'activeView' | 'onNavigate'> & { items: NavItem[]; collapsed: boolean }) {
   return (
     <ul className={styles.navList}>
       {items.map((item) => (
@@ -77,9 +81,9 @@ function NavList({
       ))}
     </ul>
   );
-}
+});
 
-export function Sidebar({ activeView, onNavigate }: SidebarProps) {
+export function Sidebar({ activeView, onNavigate, onExitSpace }: SidebarProps) {
   const pomodoro = usePomodoro();
   const { showToast } = useToast();
   const [collapsed, setCollapsed] = useState(() => {
@@ -167,6 +171,18 @@ export function Sidebar({ activeView, onNavigate }: SidebarProps) {
             {!collapsed && (pomodoro.status === 'running' ? 'Sesión en curso' : 'Iniciar sesión de estudio')}
           </button>
         </div>
+      </div>
+
+      <div className={styles.spaceSwitch}>
+        <button
+          className={styles.quickAction}
+          onClick={onExitSpace}
+          aria-label="Cambiar de espacio"
+          data-tooltip="Cambiar de espacio"
+        >
+          <Icon name="grid" size={15} />
+          {!collapsed && 'Cambiar de espacio'}
+        </button>
       </div>
 
       <div className={styles.footer}>

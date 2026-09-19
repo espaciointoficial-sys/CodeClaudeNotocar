@@ -98,6 +98,11 @@
   padding: 4px;
   font-size: 11.5px;
   color: var(--text-secondary);
+  /* Un PDF de varios cientos de páginas genera un botón por página. content-visibility deja que
+     el navegador se salte el maquetado de los que están fuera de la vista; contain-intrinsic-size
+     le da la altura que ocuparían para que la barra de desplazamiento siga siendo correcta. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 25px;
 }
 
 .pagePanel button[data-active='true'] {

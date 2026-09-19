@@ -81,6 +81,15 @@ const api: NexusApi = {
   weather: {
     current: (city) => ipcRenderer.invoke(IPC_CHANNELS.weather.current, city),
   },
+  monitor: {
+    snapshot: () => ipcRenderer.invoke(IPC_CHANNELS.monitor.snapshot),
+    sample: () => ipcRenderer.invoke(IPC_CHANNELS.monitor.sample),
+    report: () => ipcRenderer.invoke(IPC_CHANNELS.monitor.report),
+    storageUsage: () => ipcRenderer.invoke(IPC_CHANNELS.monitor.storageUsage),
+    quickActions: () => ipcRenderer.invoke(IPC_CHANNELS.monitor.quickActions),
+    runQuickAction: (id) => ipcRenderer.invoke(IPC_CHANNELS.monitor.runQuickAction, id),
+    latency: () => ipcRenderer.invoke(IPC_CHANNELS.monitor.latency),
+  },
   updates: {
     getStatus: () => ipcRenderer.invoke(IPC_CHANNELS.updates.getStatus),
     check: () => ipcRenderer.invoke(IPC_CHANNELS.updates.check),

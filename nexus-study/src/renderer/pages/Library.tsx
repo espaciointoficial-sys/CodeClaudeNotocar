@@ -15,11 +15,18 @@ import styles from './Library.module.css';
 type SortKey = 'relevance' | 'lastOpenedAt' | 'importedAt' | 'name';
 type DateFilter = 'any' | 'week' | 'month';
 
+// Cada búsqueda recorre también el texto extraído de los PDF, así que sale cara. Esperar a que
+// el usuario deje de escribir convierte una consulta por tecla en una por palabra.
+const SEARCH_DEBOUNCE_MS = 250;
+
 export function Library({ focusSearch }: { focusSearch?: boolean }) {
   const [subjects, setSubjects] = useState<SubjectWithStats[]>([]);
   const [documents, setDocuments] = useState<DocumentItem[] | null>(null);
   const [foldersById, setFoldersById] = useState<Map<string, Folder>>(new Map());
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [reloadToken, setReloadToken] = useState(0);
+  const loadedSubjectsRef = useRef(new Set<string>());
   const [subjectId, setSubjectId] = useState('');
   const [fileType, setFileType] = useState<DocumentFileType | ''>('');
   const [favoritesOnly, setFavoritesOnly] = useState(false);
@@ -39,29 +46,46 @@ export function Library({ focusSearch }: { focusSearch?: boolean }) {
     if (focusSearch) searchRef.current?.focus();
   }, [focusSearch]);
 
-  const load = () => {
+  useEffect(() => {
+    const timeout = setTimeout(() => setDebouncedSearch(search), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timeout);
+  }, [search]);
+
+  const load = () => setReloadToken((token) => token + 1);
+
+  useEffect(() => {
+    let cancelled = false;
     window.api.documents
       .listLibrary({
         subjectId: subjectId || undefined,
         fileType: fileType || undefined,
         favoritesOnly: favoritesOnly || undefined,
-        search: search || undefined,
+        search: debouncedSearch || undefined,
         sortBy,
       })
       .then(async (docs) => {
+        // cancelled evita que una respuesta lenta de una búsqueda anterior pise a la actual.
+        if (cancelled) return;
         setDocuments(docs);
-        const subjectIds = Array.from(new Set(docs.map((d) => d.subjectId)));
-        const folderLists = await Promise.all(subjectIds.map((id) => window.api.folders.listBySubject(id)));
-        const map = new Map<string, Folder>();
-        folderLists.flat().forEach((f) => map.set(f.id, f));
-        setFoldersById(map);
+        // Los temas de una asignatura no cambian mientras la Biblioteca está abierta: basta con
+        // pedir los de las asignaturas que aún no se hayan cargado en esta visita.
+        const pending = Array.from(new Set(docs.map((d) => d.subjectId))).filter(
+          (id) => !loadedSubjectsRef.current.has(id),
+        );
+        if (pending.length === 0) return;
+        const folderLists = await Promise.all(pending.map((id) => window.api.folders.listBySubject(id)));
+        if (cancelled) return;
+        pending.forEach((id) => loadedSubjectsRef.current.add(id));
+        setFoldersById((previous) => {
+          const next = new Map(previous);
+          folderLists.flat().forEach((folder) => next.set(folder.id, folder));
+          return next;
+        });
       });
-  };
-
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, subjectId, fileType, favoritesOnly, sortBy]);
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedSearch, subjectId, fileType, favoritesOnly, sortBy, reloadToken]);
 
   const subjectNameById = useMemo(() => new Map(subjects.map((s) => [s.id, s.name])), [subjects]);
   const hasActiveFilters = Boolean(search || subjectId || fileType || favoritesOnly || dateFilter !== 'any');

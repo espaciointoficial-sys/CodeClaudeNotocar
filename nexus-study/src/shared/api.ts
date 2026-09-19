@@ -27,6 +27,12 @@ import type {
   Subject,
   SubjectInput,
   SubjectWithStats,
+  SystemLatency,
+  SystemQuickAction,
+  SystemReport,
+  SystemSample,
+  SystemSnapshot,
+  SystemStorageUsage,
   TaskFilters,
   TaskInput,
   UpdateStatus,
@@ -110,6 +116,29 @@ export interface NexusApi {
   };
   weather: {
     current: (city: string) => Promise<WeatherResult>;
+  };
+  /**
+   * Monitor local del equipo. Se consulta bajo demanda: no hay ningún sondeo en el proceso
+   * principal, así que al salir del espacio Sistema el coste desaparece por sí solo.
+   *
+   * Ninguna de estas funciones acepta rutas, procesos ni comandos: la única que recibe algo es
+   * runAction, y su argumento se valida contra una lista blanca fija en el proceso principal.
+   */
+  monitor: {
+    /** Métricas baratas (Node y Electron). Apta para pedirse cada uno o dos segundos. */
+    snapshot: () => Promise<SystemSnapshot>;
+    /** Métricas caras (procesos, disco, GPU). Solo la piden las pantallas que las muestran. */
+    sample: () => Promise<SystemSample>;
+    /** Datos que no cambian durante la sesión. Se calcula una vez y se reutiliza. */
+    report: () => Promise<SystemReport>;
+    /** Espacio que ocupa Nexus Study. Recorre carpetas, así que solo se pide al abrir la pantalla. */
+    storageUsage: () => Promise<SystemStorageUsage>;
+    /** Acciones disponibles en este sistema operativo. */
+    quickActions: () => Promise<SystemQuickAction[]>;
+    /** Abre la herramienta nativa asociada a un identificador de la lista blanca. */
+    runQuickAction: (id: string) => Promise<void>;
+    /** Mide la latencia hasta la puerta de enlace local. No contacta con ningún servidor externo. */
+    latency: () => Promise<SystemLatency>;
   };
   updates: {
     getStatus: () => Promise<UpdateStatus>;
@@ -198,6 +227,15 @@ export const IPC_CHANNELS = {
   },
   weather: {
     current: 'weather:current',
+  },
+  monitor: {
+    snapshot: 'monitor:snapshot',
+    sample: 'monitor:sample',
+    report: 'monitor:report',
+    storageUsage: 'monitor:storageUsage',
+    quickActions: 'monitor:quickActions',
+    runQuickAction: 'monitor:runQuickAction',
+    latency: 'monitor:latency',
   },
   updates: {
     getStatus: 'updates:getStatus',

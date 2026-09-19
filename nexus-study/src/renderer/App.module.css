@@ -5,6 +5,20 @@
   background: var(--bg-app);
   padding: var(--space-3);
   gap: var(--space-3);
+  animation: appear 180ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+/* El espacio inactivo se oculta en vez de desmontarse: así conserva la pantalla en la que estabas,
+   los formularios a medio escribir y la posición de las listas. Con display:none el navegador no
+   maqueta ni pinta nada de este subárbol, de modo que estar oculto no cuesta nada. */
+.shell.hidden {
+  display: none;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
 }
 
 .content {

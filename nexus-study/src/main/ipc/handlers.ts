@@ -34,6 +34,9 @@ import { StatsRepository } from '../repositories/stats.repo.ts';
 import { deleteDocumentFile, getDocumentsDir, importFileToStorage } from '../files/storage.ts';
 import { extractPdfInfo } from '../files/pdf.ts';
 import { fetchWeather } from '../services/weather.ts';
+import { getSystemSample, getSystemSnapshot } from '../services/systemMonitor.ts';
+import { getStorageUsage, getSystemReport } from '../services/systemReport.ts';
+import { listQuickActions, measureLatency, runQuickAction } from '../services/systemActions.ts';
 import { newId, ValidationError } from '../lib/util.ts';
 import { assertString, assertStringArray } from './validate.ts';
 
@@ -235,4 +238,16 @@ export function registerIpcHandlers(ctx: IpcContext): void {
 
   // ---- Tiempo ----
   handle(IPC_CHANNELS.weather.current, (city: string) => fetchWeather(typeof city === 'string' ? city : ''));
+
+  // ---- Monitor del equipo ----
+  // Salvo runQuickAction, ninguno acepta parámetros: el renderer solo puede pedir la foto completa,
+  // nunca consultar rutas ni procesos concretos del equipo. runQuickAction recibe un identificador
+  // que se valida contra una lista blanca fija; no hay forma de enviar un comando desde la interfaz.
+  handle(IPC_CHANNELS.monitor.snapshot, () => getSystemSnapshot());
+  handle(IPC_CHANNELS.monitor.sample, () => getSystemSample());
+  handle(IPC_CHANNELS.monitor.report, () => getSystemReport());
+  handle(IPC_CHANNELS.monitor.storageUsage, () => getStorageUsage(ctx.userDataDir));
+  handle(IPC_CHANNELS.monitor.quickActions, () => listQuickActions());
+  handle(IPC_CHANNELS.monitor.runQuickAction, (id: string) => runQuickAction(id, ctx.userDataDir));
+  handle(IPC_CHANNELS.monitor.latency, () => measureLatency());
 }

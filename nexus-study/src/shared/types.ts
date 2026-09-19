@@ -291,6 +291,220 @@ export interface HomeSummary {
   weeklyGoalSeconds: number;
 }
 
+// ---- Monitor del equipo ----
+// Todas estas métricas se leen en local, se muestran en pantalla y no se guardan ni se envían
+// a ningún servicio externo.
+//
+// Están separadas en tres grupos según lo que cuesta obtenerlas, porque de ahí sale el ritmo al
+// que cada pantalla puede pedirlas:
+//   · SystemSnapshot  — solo APIs de Node y Electron, ~1 ms. Se puede pedir cada segundo.
+//   · SystemSample    — obliga a lanzar una utilidad del sistema, ~500 ms. Solo las pantallas
+//                       que de verdad lo muestran, y a un ritmo más lento.
+//   · SystemReport    — datos que no cambian mientras la aplicación está abierta. Una sola vez.
+
+export interface SystemInfo {
+  /** Nombre legible del sistema operativo, p. ej. "Windows 11 Pro". */
+  osName: string;
+  osRelease: string;
+  arch: string;
+  hostname: string;
+  cpuModel: string;
+  /** Número de núcleos lógicos (hilos) que expone el sistema. */
+  cpuCount: number;
+  /** Frecuencia declarada por el sistema en MHz, o null si no la informa. */
+  cpuSpeedMhz: number | null;
+}
+
+export interface SystemCpu {
+  /** null en la primera muestra, cuando todavía no hay dos lecturas que comparar. */
+  usagePercent: number | null;
+  /** Uso de cada núcleo lógico, en el mismo orden que los enumera el sistema. */
+  perCorePercent: number[] | null;
+}
+
+export interface SystemMemory {
+  totalBytes: number;
+  usedBytes: number;
+  freeBytes: number;
+  usagePercent: number;
+}
+
+export interface SystemDisk {
+  /** Raíz de la unidad o punto de montaje, p. ej. "C:\\" o "/". */
+  mount: string;
+  totalBytes: number;
+  usedBytes: number;
+  freeBytes: number;
+  usagePercent: number;
+}
+
+export type NetworkKind = 'wifi' | 'ethernet' | 'other';
+
+export interface SystemNetwork {
+  /** Nombre del adaptador activo, p. ej. "Wi-Fi" o "Ethernet". */
+  interfaceName: string | null;
+  /** Deducido del nombre del adaptador; null si no se reconoce. */
+  kind: NetworkKind | null;
+  /** Dirección del equipo dentro de su propia red. Nunca sale de aquí. */
+  localIp: string | null;
+  /** null cuando la plataforma no expone contadores de bytes, o en la primera muestra. */
+  downloadBytesPerSecond: number | null;
+  uploadBytesPerSecond: number | null;
+  /** Bytes acumulados desde que se abrió la aplicación. */
+  sessionReceivedBytes: number | null;
+  sessionSentBytes: number | null;
+}
+
+export interface SystemDisplay {
+  id: number;
+  width: number;
+  height: number;
+  scaleFactor: number;
+  /** Hz, o null si el sistema no lo informa. */
+  refreshRate: number | null;
+  primary: boolean;
+}
+
+export interface SystemSnapshot {
+  info: SystemInfo;
+  cpu: SystemCpu;
+  memory: SystemMemory;
+  disks: SystemDisk[];
+  network: SystemNetwork;
+  uptimeSeconds: number;
+  /** null = no se ha podido determinar si el equipo tiene batería. */
+  hasBattery: boolean | null;
+  sampledAt: string;
+}
+
+export interface SystemProcess {
+  pid: number;
+  name: string;
+  /** null hasta que hay dos muestras seguidas del mismo proceso. */
+  cpuPercent: number | null;
+  memoryBytes: number;
+  /** Lectura + escritura en bytes/s. null donde la plataforma no lo expone. */
+  diskBytesPerSecond: number | null;
+}
+
+export interface SystemDiskActivity {
+  readBytesPerSecond: number | null;
+  writeBytesPerSecond: number | null;
+}
+
+export interface SystemGpuLoad {
+  /** Uso del motor 3D en porcentaje, o null si no puede medirse de forma fiable. */
+  usagePercent: number | null;
+  dedicatedMemoryBytes: number | null;
+}
+
+/** Muestra cara: obliga a lanzar una utilidad del sistema (~500 ms en Windows). */
+export interface SystemSample {
+  processes: SystemProcess[];
+  disk: SystemDiskActivity;
+  gpu: SystemGpuLoad;
+  /** Memoria usada como caché de archivos. null donde el sistema no lo expone. */
+  memoryCacheBytes: number | null;
+  sampledAt: string;
+}
+
+/** Datos de batería obtenidos en el renderer con la API estándar del navegador. */
+export interface BatteryStatus {
+  /** Carga actual entre 0 y 1. */
+  level: number;
+  charging: boolean;
+  chargingSecondsLeft: number | null;
+  dischargingSecondsLeft: number | null;
+}
+
+// ---- Informe del equipo (una sola consulta por sesión) ----
+
+export interface SystemVolumeInfo {
+  /** Coincide con SystemDisk.mount para poder cruzarlos. */
+  mount: string;
+  label: string | null;
+  fileSystem: string | null;
+  /** "Fixed", "Removable", "Network"… tal como lo clasifica el sistema. */
+  driveType: string | null;
+  /** "SSD", "HDD"… null si no se puede saber. */
+  mediaType: string | null;
+  busType: string | null;
+  model: string | null;
+}
+
+export interface SystemAntivirus {
+  name: string;
+  /** null = el sistema informa del producto pero no de su estado. */
+  enabled: boolean | null;
+  upToDate: boolean | null;
+  updatedAt: string | null;
+}
+
+export interface SystemSecurity {
+  /** Vacío si la plataforma no expone un centro de seguridad consultable. */
+  antivirus: SystemAntivirus[];
+  firewall: { profile: string; enabled: boolean }[];
+}
+
+export interface SystemGpuInfo {
+  name: string;
+  driverVersion: string | null;
+  resolution: string | null;
+  refreshHz: number | null;
+}
+
+export interface SystemHardware {
+  manufacturer: string | null;
+  model: string | null;
+  baseboard: string | null;
+  bios: string | null;
+  /** Núcleos físicos, frente a SystemInfo.cpuCount que son los lógicos. */
+  cpuCores: number | null;
+  cpuMaxMhz: number | null;
+  gpus: SystemGpuInfo[];
+  memoryModules: { capacityBytes: number; speedMhz: number | null; manufacturer: string | null }[];
+  audioDevices: string[];
+  displays: SystemDisplay[];
+}
+
+export interface SystemReport {
+  hardware: SystemHardware;
+  security: SystemSecurity;
+  volumes: SystemVolumeInfo[];
+  /** Puerta de enlace y red Wi-Fi actuales. Solo para mostrarlas aquí. */
+  gateway: string | null;
+  ssid: string | null;
+  /** Explicaciones en lenguaje claro de lo que no ha podido leerse en este equipo. */
+  notes: string[];
+}
+
+/** Espacio que ocupa Nexus Study en el disco. Se calcula solo cuando se pide. */
+export interface SystemStorageUsage {
+  dataDir: string;
+  documentsBytes: number;
+  databaseBytes: number;
+  otherBytes: number;
+  documentCount: number;
+}
+
+// ---- Acciones rápidas ----
+// El renderer solo puede pedir un identificador de esta lista; nunca un comando.
+
+export interface SystemQuickAction {
+  id: string;
+  label: string;
+  /** Qué abrirá exactamente, para mostrarlo antes de pulsar. */
+  description: string;
+  icon: string;
+}
+
+export interface SystemLatency {
+  /** Qué se ha medido, para que quede claro que no se contacta con ningún servicio externo. */
+  target: string;
+  averageMs: number | null;
+  error?: string;
+}
+
 // ---- Actualizaciones de la aplicación ----
 
 export type UpdateState =

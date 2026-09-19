@@ -38,7 +38,12 @@
   stroke: var(--accent);
   stroke-width: 4;
   stroke-linecap: round;
-  transition: stroke-dashoffset 1s linear;
+  /* stroke-dashoffset no se puede componer en la GPU: cada fotograma de la transición obliga a
+     repintar el anillo. Con una transición de 1 s y un tic también de 1 s, el repintado no paraba
+     nunca mientras el Pomodoro corría (13,7 % de un núcleo medido). El avance real de un segundo
+     es de ~0,14 px, imperceptible, así que basta una transición corta: los saltos grandes
+     (reiniciar, cambio de fase) se siguen animando y el resto del tiempo el anillo está quieto. */
+  transition: stroke-dashoffset var(--ease-fast);
 }
 
 .clock {

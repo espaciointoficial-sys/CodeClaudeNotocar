@@ -190,6 +190,14 @@
   cursor: default;
 }
 
+.spaceSwitch {
+  width: 100%;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+}
+
 .footer {
   border-top: 1px solid var(--border);
   padding-top: var(--space-3);
